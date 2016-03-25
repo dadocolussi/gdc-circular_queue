@@ -1,0 +1,13 @@
+*~
+.DS_Store
+*.o
+*.d
+*.so
+*.dylib
+*.a
+*_xsd.h
+*.swp
+/products/
+/objects/
+*.xcodeproj/project.xcworkspace
+*.xcodeproj/xcuserdata
