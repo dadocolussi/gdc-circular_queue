@@ -95,6 +95,7 @@
 		6E9598FC1CA72B7E008B0605 /* sub.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sub.mk; sourceTree = "<group>"; };
 		6E9599391CA72EDD008B0605 /* c_impl_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = c_impl_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E9599511CA72FB7008B0605 /* cpp_impl_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cpp_impl_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E95995A1CA73107008B0605 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +119,7 @@
 		6E9598361C945240008B0605 = {
 			isa = PBXGroup;
 			children = (
+				6E95995A1CA73107008B0605 /* README.md */,
 				6E9598761C94DB00008B0605 /* LICENSE */,
 				6E9598781C94DB00008B0605 /* Makefile */,
 				6E9598791C94DB00008B0605 /* Makefile.boilermake */,
