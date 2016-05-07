@@ -171,10 +171,9 @@ gdc_circular_queue_peek(gdc_circular_queue *q)
 		return NULL;
 	}
 	
-	char *d = gdc_circular_queue_data(q);
-	
 	// Memory fence after relaxed read of wpos.
 	atomic_thread_fence(memory_order_acquire);
+	char *d = gdc_circular_queue_data(q);
 	char *p = &d[rp];
 	return p;
 }
