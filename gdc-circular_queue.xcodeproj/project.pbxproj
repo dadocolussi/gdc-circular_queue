@@ -213,7 +213,7 @@
 		6E9598371C945240008B0605 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 				TargetAttributes = {
 					6E9599381CA72EDD008B0605 = {
 						CreatedOnToolsVersion = 7.2;
@@ -286,6 +286,8 @@
 		6E95983B1C945240008B0605 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
@@ -491,6 +493,7 @@
 				6E95993F1CA72EDD008B0605 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6E95994E1CA72FB7008B0605 /* Build configuration list for PBXNativeTarget "cpp_impl_test" */ = {
 			isa = XCConfigurationList;
@@ -508,6 +511,7 @@
 				6E9599551CA72FDB008B0605 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
