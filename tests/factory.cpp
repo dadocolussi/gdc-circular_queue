@@ -126,13 +126,13 @@ SCENARIO("C/C++ circular queue factory", "[factory]")
 		{
 			THEN("can_get() returns false")
 			{
-				gdc::circular_queue_factory<char> f(name);
+				F f(name);
 				REQUIRE_FALSE(f.can_get());
 			}
 
 			THEN("mapping the queue throws gdc::circular_queue_error")
 			{
-				gdc::circular_queue_factory<char> f(name);
+				F f(name);
 				REQUIRE_THROWS_AS(f.get(), gdc::circular_queue_error);
 			}
 		}

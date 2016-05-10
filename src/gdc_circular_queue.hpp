@@ -142,7 +142,6 @@ namespace gdc
 		{
 			auto rp = _q.rpos.load(std::memory_order_relaxed);
 			auto wp = _q.wpos.load(std::memory_order_relaxed);
-			auto capacity = _q.capacity.load(std::memory_order_relaxed);
 			size_t n;
 			
 			if (wp >= rp)
@@ -162,10 +161,10 @@ namespace gdc
 				// xxxxx_____xxxxx
 				//      ^    ^
 				//     wp    rp
-				n = capacity + wp - rp;
+				n = capacity() + wp - rp;
 			}
 			
-			assert(n < capacity);
+			assert(n < capacity());
 			
 			return n;
 		}
@@ -227,8 +226,7 @@ namespace gdc
 		void pop(size_type nbytes) noexcept
 		{
 			auto rp = _q.rpos.load(std::memory_order_relaxed);
-			auto capacity = _q.capacity.load(std::memory_order_relaxed);
-			rp = (rp + nbytes) % capacity;
+			rp = (rp + nbytes) % capacity();
 			_q.rpos.store(rp, std::memory_order_relaxed);
 		}
 		
