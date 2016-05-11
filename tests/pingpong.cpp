@@ -74,6 +74,12 @@ run()
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
+	
+	if (!wqf.can_get())
+	{
+		throw std::runtime_error("Failed to resolve write queue");
+	}
+	
 	Q& wq = wqf.get();
 	std::cout << "Did resolve write queue" << std::endl;
 

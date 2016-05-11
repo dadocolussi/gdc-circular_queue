@@ -328,6 +328,7 @@ SCENARIO("circular queue in multiple threads", "[pingpong]")
 	
 	auto echo = [](Q* rq, Q* wq, std::size_t n)
 	{
+		std::size_t nullptr_peek_counter = 0;
 		std::size_t seq = 0;
 
 		while (seq < n)
@@ -336,8 +337,15 @@ SCENARIO("circular queue in multiple threads", "[pingpong]")
 
 			if (i == nullptr)
 			{
+				if (++nullptr_peek_counter > 100000)
+				{
+					throw std::runtime_error("no data");
+				}
+
 				continue;
 			}
+
+			nullptr_peek_counter = 0;
 
 			if (seq == 0)
 			{
@@ -347,14 +355,14 @@ SCENARIO("circular queue in multiple threads", "[pingpong]")
 
 			if (*i != seq)
 			{
-				REQUIRE(*i == seq);
+				throw std::runtime_error("unexpected data");
 			}
 
 			rq->pop(sizeof seq);
 
 			if (!rq->empty())
 			{
-				REQUIRE(rq->empty());
+				throw std::runtime_error("queue expected to be empty");
 			}
 
 			if (++seq < n)
