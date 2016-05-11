@@ -107,7 +107,7 @@ SCENARIO("circular queue in single thread", "[queue]")
 
 		typedef typename Q::size_type size_type;
 		size_type capacity = 10 * page_size;
-		F f(capacity, [](Q& q) -> int
+		F f(capacity, false, [](Q& q) -> int
 		{
 			auto md = q.metadata();
 			std::memcpy(md, "Hello World!", 12);

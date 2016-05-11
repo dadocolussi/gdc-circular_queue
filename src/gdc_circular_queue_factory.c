@@ -70,6 +70,7 @@ int
 gdc_circular_queue_create_shared(
 	const char* name,
 	size_t capacity,
+	int sync,
 	int (*mdinit)(gdc_circular_queue*, void*),
 	void* md_context)
 {
@@ -112,7 +113,7 @@ gdc_circular_queue_create_shared(
 	}
 	
 	gdc_circular_queue* q = p;
-	status = gdc_circular_queue_init(q, capacity, mdinit, md_context);
+	status = gdc_circular_queue_init(q, capacity, sync, mdinit, md_context);
 	
 	if (status == -1)
 	{
@@ -148,6 +149,7 @@ gdc_circular_queue_delete_shared(const char *name)
 gdc_circular_queue*
 gdc_circular_queue_create_private(
 	size_t capacity,
+	int sync,
 	int (*mdinit)(gdc_circular_queue*, void*),
 	void* md_context)
 {
@@ -157,7 +159,7 @@ gdc_circular_queue_create_private(
 	char tmp_name[32];
 	sprintf(tmp_name, "/.gdc.%d.%d", pid, unique);
 	
-	if (gdc_circular_queue_create_shared(tmp_name, capacity, mdinit, md_context) == -1)
+	if (gdc_circular_queue_create_shared(tmp_name, capacity, sync, mdinit, md_context) == -1)
 	{
 		return NULL;
 	}

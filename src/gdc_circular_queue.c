@@ -36,6 +36,13 @@
 #endif
 
 
+struct gdc_circular_queue_properties
+{
+	atomic_size_t capacity;
+	int sync;
+};
+
+
 typedef struct gdc_circular_queue
 {
 	
@@ -59,7 +66,7 @@ typedef struct gdc_circular_queue
 	union
 	{
 		// Capacity as number of bytes. This is immutable.
-		atomic_size_t capacity;
+		struct gdc_circular_queue_properties properties;
 		char pad_capacity[LEVEL1_DCACHE_LINESIZE];
 	};
 	
@@ -87,6 +94,7 @@ int
 gdc_circular_queue_init(
 	gdc_circular_queue *q,
 	size_t capacity,
+	int sync,
 	int (*mdinit)(gdc_circular_queue*, void*),
 	void* md_context)
 {
@@ -95,7 +103,8 @@ gdc_circular_queue_init(
 		return -1;
 	}
 	
-	atomic_store_explicit(&q->capacity, capacity, memory_order_release);
+	q->properties.sync = sync;
+	atomic_store_explicit(&q->properties.capacity, capacity, memory_order_release);
 	
 	return 0;
 }
@@ -126,7 +135,7 @@ gdc_circular_queue_data(gdc_circular_queue *q)
 size_t
 gdc_circular_queue_capacity(gdc_circular_queue *q)
 {
-	return atomic_load_explicit(&q->capacity, memory_order_relaxed);
+	return atomic_load_explicit(&q->properties.capacity, memory_order_relaxed);
 }
 
 
@@ -171,8 +180,12 @@ gdc_circular_queue_peek(gdc_circular_queue *q)
 		return NULL;
 	}
 	
-	// Memory fence after relaxed read of wpos.
-	atomic_thread_fence(memory_order_acquire);
+	if (q->properties.sync)
+	{
+		// Memory fence after relaxed read of wpos.
+		atomic_thread_fence(memory_order_acquire);
+	}
+	
 	char *d = gdc_circular_queue_data(q);
 	char *p = &d[rp];
 	return p;
@@ -293,7 +306,8 @@ advance_wpos(gdc_circular_queue *q, size_t len)
 {
 	size_t wp = atomic_load_explicit(&q->wpos, memory_order_relaxed);
 	wp = (wp + len) % gdc_circular_queue_capacity(q);
-	atomic_store_explicit(&q->wpos, wp, memory_order_release);
+	memory_order mo = q->properties.sync ? memory_order_release : memory_order_relaxed;
+	atomic_store_explicit(&q->wpos, wp, mo);
 }
 
 

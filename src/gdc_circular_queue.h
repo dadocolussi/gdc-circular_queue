@@ -51,6 +51,7 @@ typedef struct gdc_circular_queue gdc_circular_queue;
 int gdc_circular_queue_init(
 	gdc_circular_queue *q,
 	size_t capacity,
+	int sync,
 	int (*mdinit)(gdc_circular_queue*, void*),
 	void* md_context);
 void* gdc_circular_queue_metadata(gdc_circular_queue *q);

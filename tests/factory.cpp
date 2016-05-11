@@ -212,7 +212,7 @@ SCENARIO("C/C++ circular queue factory", "[factory]")
 		WHEN("creating a factory for shared circular_queue")
 		{
 
-			gdc::circular_queue_factory<char> f(name, 10 * page_size, init);
+			F f(name, 10 * page_size, true, init);
 
 			THEN("the initialzer function is called")
 			{
@@ -226,7 +226,7 @@ SCENARIO("C/C++ circular queue factory", "[factory]")
 
 		WHEN("creating a factory for private circular_queue")
 		{
-			F f(10 * page_size, init);
+			F f(10 * page_size, true, init);
 
 			THEN("the initialzer function is called")
 			{

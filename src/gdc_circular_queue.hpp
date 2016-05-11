@@ -43,6 +43,13 @@
 namespace gdc
 {
 
+	struct circular_queue_properties
+	{
+		std::atomic<size_t> capacity;
+		int sync;
+	};
+
+
 	struct circular_queue_control_block
 	{
 		
@@ -66,7 +73,7 @@ namespace gdc
 		union
 		{
 			// Capacity as number of bytes. This is immutable.
-			std::atomic<size_t> capacity;
+			circular_queue_properties properties;
 			char pad_capacity[LEVEL1_DCACHE_LINESIZE];
 		};
 		
@@ -112,7 +119,7 @@ namespace gdc
 		
 		size_type capacity() const noexcept
 		{
-			return _q.capacity.load(std::memory_order_relaxed);
+			return _q.properties.capacity.load(std::memory_order_relaxed);
 		}
 		
 		
@@ -214,8 +221,11 @@ namespace gdc
 				return nullptr;
 			}
 			
-			// Memory fence after relaxed read.
-			std::atomic_thread_fence(std::memory_order_acquire);
+			if (_q.properties.sync)
+			{
+				// Memory fence after relaxed read.
+				std::atomic_thread_fence(std::memory_order_acquire);
+			}
 
 			auto d = data();
 			auto p = &d[rp];
@@ -255,7 +265,8 @@ namespace gdc
 			assert(nbytes < capacity());
 			auto wp = _q.wpos.load(std::memory_order_relaxed);
 			wp = (wp + nbytes) % capacity();
-			_q.wpos.store(wp, std::memory_order_release);
+			auto mo = _q.properties.sync ? std::memory_order_release : std::memory_order_relaxed;
+			_q.wpos.store(wp, mo);
 		}
 		
 		

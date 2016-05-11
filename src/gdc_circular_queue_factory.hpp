@@ -69,6 +69,7 @@ namespace gdc
 		
 		std::string _name;
 		size_type _capacity;
+		bool _sync;
 		mdinit_type _metadata_initializer;
 		unique_ptr _q;
 		
@@ -113,6 +114,7 @@ namespace gdc
 		static void create_shared(
 			const std::string& name,
 			size_type capacity,
+			bool sync,
 			mdinit_type metadata_initializer)
 		{
 			// Unlink any old shared memory object with the same name.
@@ -166,7 +168,8 @@ namespace gdc
 				auto q = new (p) Q();
 				metadata_initializer(*q);
 				auto qq = reinterpret_cast<circular_queue_control_block*>(p);
-				qq->capacity.store(capacity, std::memory_order_release);
+				qq->properties.sync = sync;
+				qq->properties.capacity.store(capacity, std::memory_order_release);
 			}
 			catch (const std::exception& ex)
 			{
@@ -320,6 +323,7 @@ namespace gdc
 		
 		static Q* create_private(
 			size_type capacity,
+			bool sync,
 			mdinit_type metadata_initializer)
 		{
 			static std::atomic<int> seq(0);
@@ -327,7 +331,7 @@ namespace gdc
 			pid_t pid = ::getpid();
 			char tmp_name[32];
 			std::sprintf(tmp_name, "/.gdcq.%d.%d", pid, unique);
-			create_shared(tmp_name, capacity, metadata_initializer);
+			create_shared(tmp_name, capacity, sync, metadata_initializer);
 			Q* q = nullptr;
 
 			try
@@ -382,7 +386,7 @@ namespace gdc
 				if (_capacity > 0)
 				{
 					// We set the capacity, hence we create the queue.
-					create_shared(_name, _capacity, _metadata_initializer);
+					create_shared(_name, _capacity, _sync, _metadata_initializer);
 				}
 				
 				_q = unique_ptr(map_shared(_name), unmap_shared);
@@ -392,6 +396,7 @@ namespace gdc
 				_q = unique_ptr(
 					create_private(
 						_capacity,
+						_sync,
 						_metadata_initializer),
 					delete_private);
 			}
@@ -406,9 +411,11 @@ namespace gdc
 		circular_queue_factory(
 			const std::string& name,
 			size_type capacity,
+			bool sync = true,
 			mdinit_type metadata_initializer = [](Q&) -> int { return 0; }) :
 			_name(name),
 			_capacity(capacity),
+			_sync(sync),
 			_metadata_initializer(metadata_initializer),
 			_q(nullptr, null_queue_destroyer)
 		{
@@ -421,6 +428,7 @@ namespace gdc
 		circular_queue_factory(const std::string& name) :
 			_name(name),
 			_capacity(0),
+		    _sync(false),
 			_q(nullptr, null_queue_destroyer)
 		{
 			assert(!name.empty());
@@ -430,8 +438,10 @@ namespace gdc
 		// For creating a new in-process queue.
 		circular_queue_factory(
 			size_type capacity,
+			bool sync = true,
 			mdinit_type metadata_initializer = [](Q&) -> int { return 0; }) :
 			_capacity(capacity),
+			_sync(sync),
 			_metadata_initializer(metadata_initializer),
 			_q(nullptr, null_queue_destroyer)
 		{
